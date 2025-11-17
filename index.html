@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hussein Designer</title>
+    <title>Hussein AboZodah</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* الأساسيات */
@@ -310,6 +310,12 @@
             background-color: #555;
         }
         
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            margin: 5px 0;
+        }
+        
         /* القوائم */
         .menu {
             display: flex;
@@ -513,7 +519,8 @@
             max-height: 500px;
         }
         
-        .additional-question {
+        /* قسم التعليقات */
+        .comments-section {
             margin-top: 30px;
             background-color: rgba(255, 255, 255, 0.85);
             padding: 20px;
@@ -521,6 +528,117 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(5px);
             border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .comments-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .comment-form {
+            margin-bottom: 30px;
+        }
+        
+        .comments-list {
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        
+        .comment {
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            border-right: 4px solid var(--primary-color);
+        }
+        
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .comment-author {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .comment-date {
+            color: #888;
+        }
+        
+        .comment-content {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .comment-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .reply-form {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: rgba(240, 240, 240, 0.7);
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .reply-form.active {
+            display: block;
+        }
+        
+        .reply {
+            background-color: rgba(240, 240, 240, 0.7);
+            padding: 10px 15px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border-right: 3px solid var(--secondary-color);
+        }
+        
+        .reply-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .reply-author {
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+        
+        .reply-content {
+            line-height: 1.4;
+        }
+        
+        .no-comments {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .view-replies-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            text-decoration: underline;
+        }
+        
+        .view-replies-btn:hover {
+            color: var(--secondary-color);
         }
         
         /* صفحة من أنا */
@@ -693,6 +811,11 @@
             .floating-shapes {
                 display: none;
             }
+            
+            .comment-header {
+                flex-direction: column;
+                gap: 5px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -749,7 +872,7 @@
         <!-- الصفحة الرئيسية -->
         <div id="home-page" class="page active">
             <div class="logo">
-                <h1>Hussein Designer</h1>
+                <h1>Hussein AboZodah</h1>
             </div>
             
             <div class="welcome">
@@ -838,16 +961,27 @@
                     </div>
                 </div>
                 
-                <!-- سؤال إضافي -->
-                <div class="additional-question">
-                    <h4 style="margin-bottom: 15px;">سؤال اخر...</h4>
-                    <div class="form-group">
-                        <textarea id="consultation-question" name="question" placeholder="اكتب سؤالك هنا..."></textarea>
+                <!-- قسم التعليقات -->
+                <div class="comments-section">
+                    <h3>قسم التعليقات</h3>
+                    <div class="comment-form">
+                        <div class="form-group">
+                            <label for="consultation-name">اسمك:</label>
+                            <input type="text" id="consultation-name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="consultation-comment">تعليقك:</label>
+                            <textarea id="consultation-comment" name="comment" required placeholder="اكتب تعليقك هنا..."></textarea>
+                        </div>
+                        <button class="btn" onclick="addComment('consultation')" id="submit-consultation-comment">
+                            <span id="consultation-text">إرسال التعليق</span>
+                            <span id="consultation-loading" class="loading" style="display: none;"></span>
+                        </button>
                     </div>
-                    <button class="btn" onclick="submitQuestion('consultation')" id="submit-consultation-question">
-                        <span id="consultation-text">إرسال السؤال</span>
-                        <span id="consultation-loading" class="loading" style="display: none;"></span>
-                    </button>
+                    
+                    <div class="comments-list" id="consultation-comments">
+                        <!-- سيتم عرض التعليقات هنا -->
+                    </div>
                 </div>
             </div>
             
@@ -922,16 +1056,27 @@
                     </div>
                 </div>
                 
-                <!-- سؤال إضافي -->
-                <div class="additional-question">
-                    <h4 style="margin-bottom: 15px;">سؤال اخر...</h4>
-                    <div class="form-group">
-                        <textarea id="design-question" name="question" placeholder="اكتب سؤالك هنا..."></textarea>
+                <!-- قسم التعليقات -->
+                <div class="comments-section">
+                    <h3>قسم التعليقات</h3>
+                    <div class="comment-form">
+                        <div class="form-group">
+                            <label for="design-name">اسمك:</label>
+                            <input type="text" id="design-name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="design-comment">تعليقك:</label>
+                            <textarea id="design-comment" name="comment" required placeholder="اكتب تعليقك هنا..."></textarea>
+                        </div>
+                        <button class="btn" onclick="addComment('design')" id="submit-design-comment">
+                            <span id="design-text">إرسال التعليق</span>
+                            <span id="design-loading" class="loading" style="display: none;"></span>
+                        </button>
                     </div>
-                    <button class="btn" onclick="submitQuestion('design')" id="submit-design-question">
-                        <span id="design-text">إرسال السؤال</span>
-                        <span id="design-loading" class="loading" style="display: none;"></span>
-                    </button>
+                    
+                    <div class="comments-list" id="design-comments">
+                        <!-- سيتم عرض التعليقات هنا -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -1069,16 +1214,27 @@
                     </div>
                 </div>
                 
-                <!-- سؤال إضافي -->
-                <div class="additional-question">
-                    <h4 style="margin-bottom: 15px;">سؤال اخر...</h4>
-                    <div class="form-group">
-                        <textarea id="office-question" name="question" placeholder="اكتب سؤالك هنا..."></textarea>
+                <!-- قسم التعليقات -->
+                <div class="comments-section">
+                    <h3>قسم التعليقات</h3>
+                    <div class="comment-form">
+                        <div class="form-group">
+                            <label for="office-name">اسمك:</label>
+                            <input type="text" id="office-name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="office-comment">تعليقك:</label>
+                            <textarea id="office-comment" name="comment" required placeholder="اكتب تعليقك هنا..."></textarea>
+                        </div>
+                        <button class="btn" onclick="addComment('office')" id="submit-office-comment">
+                            <span id="office-text">إرسال التعليق</span>
+                            <span id="office-loading" class="loading" style="display: none;"></span>
+                        </button>
                     </div>
-                    <button class="btn" onclick="submitQuestion('office')" id="submit-office-question">
-                        <span id="office-text">إرسال السؤال</span>
-                        <span id="office-loading" class="loading" style="display: none;"></span>
-                    </button>
+                    
+                    <div class="comments-list" id="office-comments">
+                        <!-- سيتم عرض التعليقات هنا -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -1155,14 +1311,14 @@
         <!-- صفحة الحجز -->
         <div id="booking-page" class="page">
             <div class="navigation">
-                <button class="btn btn-secondary" onclick="goBack()">← الرجوع</button>
+                <button class="btn btn-secondary" onclick="goBackFromBooking()">← الرجوع</button>
             </div>
             
             <h2 style="text-align: center; margin-bottom: 30px;">احجز الآن</h2>
             
             <div class="form-container">
                 <form id="booking-form" action="https://formspree.io/f/mzzykjkn" method="POST">
-                    <input type="hidden" name="_subject" value="حجز جديد - Hussein Designer">
+                    <input type="hidden" name="_subject" value="حجز جديد - Hussein AboZodah">
                     <input type="hidden" name="_language" value="ar">
                     
                     <div class="form-group">
@@ -1365,11 +1521,33 @@
     <script>
         // متغير لتتبع الصفحة السابقة
         let previousPage = 'home-page';
+        let bookingSource = ''; // لتتبع مصدر الدخول لصفحة الحجز
+        
+        // تخزين التعليقات محلياً
+        let comments = {
+            consultation: [],
+            design: [],
+            office: []
+        };
+        
+        // تحميل التعليقات من التخزين المحلي عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedComments = localStorage.getItem('husseinDesignerComments');
+            if (savedComments) {
+                comments = JSON.parse(savedComments);
+                renderAllComments();
+            }
+        });
         
         // دالة للتنقل بين الصفحات
         function showPage(pageId) {
             // حفظ الصفحة الحالية كسابقة
             previousPage = document.querySelector('.page.active').id;
+            
+            // إذا كنا ننتقل إلى صفحة الحجز، احفظ مصدر الدخول
+            if (pageId === 'booking-page') {
+                bookingSource = previousPage;
+            }
             
             // إخفاء جميع الصفحات
             const pages = document.querySelectorAll('.page');
@@ -1387,6 +1565,15 @@
         // دالة للرجوع للصفحة السابقة
         function goBack() {
             showPage(previousPage);
+        }
+        
+        // دالة خاصة للرجوع من صفحة الحجز
+        function goBackFromBooking() {
+            if (bookingSource && bookingSource !== 'gift-page') {
+                showPage(bookingSource);
+            } else {
+                showPage('services-page');
+            }
         }
         
         // دالة لعرض الإشعارات
@@ -1468,36 +1655,35 @@
             }
         }
         
-        // دالة لإرسال الأسئلة الإضافية
-        function submitQuestion(type) {
-            let questionText = '';
-            let buttonId = '';
-            let textId = '';
-            let loadingId = '';
-            let serviceType = '';
+        // دالة لإضافة تعليق جديد
+        function addComment(section) {
+            let nameInput, commentInput, buttonId, textId, loadingId;
             
-            if (type === 'design') {
-                questionText = document.getElementById('design-question').value;
-                buttonId = 'submit-design-question';
+            if (section === 'design') {
+                nameInput = document.getElementById('design-name');
+                commentInput = document.getElementById('design-comment');
+                buttonId = 'submit-design-comment';
                 textId = 'design-text';
                 loadingId = 'design-loading';
-                serviceType = 'تصميم';
-            } else if (type === 'consultation') {
-                questionText = document.getElementById('consultation-question').value;
-                buttonId = 'submit-consultation-question';
+            } else if (section === 'consultation') {
+                nameInput = document.getElementById('consultation-name');
+                commentInput = document.getElementById('consultation-comment');
+                buttonId = 'submit-consultation-comment';
                 textId = 'consultation-text';
                 loadingId = 'consultation-loading';
-                serviceType = 'استشارة';
-            } else if (type === 'office') {
-                questionText = document.getElementById('office-question').value;
-                buttonId = 'submit-office-question';
+            } else if (section === 'office') {
+                nameInput = document.getElementById('office-name');
+                commentInput = document.getElementById('office-comment');
+                buttonId = 'submit-office-comment';
                 textId = 'office-text';
                 loadingId = 'office-loading';
-                serviceType = 'أوفيس';
             }
             
-            if (questionText.trim() === '') {
-                showNotification('يرجى كتابة سؤال قبل الإرسال', 'error');
+            const name = nameInput.value.trim();
+            const commentText = commentInput.value.trim();
+            
+            if (name === '' || commentText === '') {
+                showNotification('يرجى ملء جميع الحقول', 'error');
                 return;
             }
             
@@ -1510,45 +1696,174 @@
             submitLoading.style.display = 'inline-block';
             submitBtn.disabled = true;
             
-            // إرسال السؤال إلى Formspree
-            const formData = new FormData();
-            formData.append('_subject', `سؤال جديد - ${serviceType}`);
-            formData.append('_language', 'ar');
-            formData.append('service', serviceType);
-            formData.append('question', questionText);
-            
-            fetch('https://formspree.io/f/mzzykjkn', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Accept': 'application/json'
-                }
-            })
-            .then(response => {
-                if (response.ok) {
-                    showNotification('شكراً على سؤالك! سنقوم بالرد عليك قريباً.', 'success');
-                    
-                    // مسح حقل النص بعد الإرسال
-                    if (type === 'design') {
-                        document.getElementById('design-question').value = '';
-                    } else if (type === 'consultation') {
-                        document.getElementById('consultation-question').value = '';
-                    } else if (type === 'office') {
-                        document.getElementById('office-question').value = '';
-                    }
-                } else {
-                    showNotification('حدث خطأ في الإرسال. يرجى المحاولة مرة أخرى.', 'error');
-                }
-            })
-            .catch(error => {
-                showNotification('حدث خطأ في الإرسال. يرجى المحاولة مرة أخرى.', 'error');
-            })
-            .finally(() => {
+            // محاكاة إرسال التعليق (في تطبيق حقيقي، سيتم إرساله إلى الخادم)
+            setTimeout(() => {
+                // إنشاء تعليق جديد
+                const newComment = {
+                    id: Date.now(),
+                    name: name,
+                    comment: commentText,
+                    date: new Date().toLocaleString('ar-SA'),
+                    replies: []
+                };
+                
+                // إضافة التعليق إلى القائمة
+                comments[section].push(newComment);
+                
+                // حفظ التعليقات في التخزين المحلي
+                localStorage.setItem('husseinDesignerComments', JSON.stringify(comments));
+                
+                // إعادة عرض التعليقات
+                renderComments(section);
+                
+                // مسح الحقول
+                nameInput.value = '';
+                commentInput.value = '';
+                
+                showNotification('تم إرسال تعليقك بنجاح!', 'success');
+                
                 // إعادة عرض زر الإرسال
                 submitText.style.display = 'inline';
                 submitLoading.style.display = 'none';
                 submitBtn.disabled = false;
+            }, 1000);
+        }
+        
+        // دالة لإضافة رد على تعليق
+        function addReply(section, commentId) {
+            const replyNameInput = document.getElementById(`reply-name-${commentId}`);
+            const replyTextInput = document.getElementById(`reply-text-${commentId}`);
+            
+            const replyName = replyNameInput.value.trim();
+            const replyText = replyTextInput.value.trim();
+            
+            if (replyName === '' || replyText === '') {
+                showNotification('يرجى ملء جميع الحقول', 'error');
+                return;
+            }
+            
+            // إيجاد التعليق وإضافة الرد
+            const comment = comments[section].find(c => c.id === commentId);
+            if (comment) {
+                const newReply = {
+                    id: Date.now(),
+                    author: replyName,
+                    content: replyText,
+                    date: new Date().toLocaleString('ar-SA')
+                };
+                
+                comment.replies.push(newReply);
+                
+                // حفظ التعليقات في التخزين المحلي
+                localStorage.setItem('husseinDesignerComments', JSON.stringify(comments));
+                
+                // إعادة عرض التعليقات
+                renderComments(section);
+                
+                showNotification('تم إرسال ردك بنجاح!', 'success');
+            }
+        }
+        
+        // دالة لعرض نموذج الرد
+        function showReplyForm(commentId) {
+            // إخفاء جميع نماذج الرد
+            document.querySelectorAll('.reply-form').forEach(form => {
+                form.classList.remove('active');
             });
+            
+            // إظهار نموذج الرد المطلوب
+            const replyForm = document.getElementById(`reply-form-${commentId}`);
+            if (replyForm) {
+                replyForm.classList.add('active');
+            }
+        }
+        
+        // دالة لإظهار/إخفاء الردود
+        function toggleReplies(commentId) {
+            const repliesContainer = document.getElementById(`replies-${commentId}`);
+            const toggleButton = document.querySelector(`[onclick="toggleReplies(${commentId})"]`);
+            
+            if (repliesContainer.style.display === 'none') {
+                repliesContainer.style.display = 'block';
+                toggleButton.textContent = 'إخفاء الردود';
+            } else {
+                repliesContainer.style.display = 'none';
+                toggleButton.textContent = 'عرض الردود';
+            }
+        }
+        
+        // دالة لعرض جميع التعليقات
+        function renderAllComments() {
+            renderComments('consultation');
+            renderComments('design');
+            renderComments('office');
+        }
+        
+        // دالة لعرض التعليقات لقسم معين
+        function renderComments(section) {
+            const commentsContainer = document.getElementById(`${section}-comments`);
+            const commentsList = comments[section];
+            
+            if (commentsList.length === 0) {
+                commentsContainer.innerHTML = '<div class="no-comments">لا توجد تعليقات بعد. كن أول من يعلق!</div>';
+                return;
+            }
+            
+            let commentsHTML = '';
+            
+            commentsList.forEach(comment => {
+                let repliesHTML = '';
+                let repliesCount = 0;
+                
+                if (comment.replies && comment.replies.length > 0) {
+                    repliesCount = comment.replies.length;
+                    comment.replies.forEach(reply => {
+                        repliesHTML += `
+                            <div class="reply">
+                                <div class="reply-header">
+                                    <span class="reply-author">${reply.author}</span>
+                                    <span class="reply-date">${reply.date}</span>
+                                </div>
+                                <div class="reply-content">${reply.content}</div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                commentsHTML += `
+                    <div class="comment">
+                        <div class="comment-header">
+                            <span class="comment-author">${comment.name}</span>
+                            <span class="comment-date">${comment.date}</span>
+                        </div>
+                        <div class="comment-content">${comment.comment}</div>
+                        <div class="comment-actions">
+                            <button class="btn btn-small" onclick="showReplyForm(${comment.id})">رد</button>
+                            ${repliesCount > 0 ? `<button class="view-replies-btn" onclick="toggleReplies(${comment.id})">عرض الردود (${repliesCount})</button>` : ''}
+                        </div>
+                        
+                        <div class="reply-form" id="reply-form-${comment.id}">
+                            <div class="form-group">
+                                <label for="reply-name-${comment.id}">اسمك:</label>
+                                <input type="text" id="reply-name-${comment.id}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="reply-text-${comment.id}">ردك:</label>
+                                <textarea id="reply-text-${comment.id}" required placeholder="اكتب ردك هنا..."></textarea>
+                            </div>
+                            <button class="btn btn-small" onclick="addReply('${section}', ${comment.id})">إرسال الرد</button>
+                        </div>
+                        
+                        ${repliesCount > 0 ? `
+                            <div id="replies-${comment.id}" style="display: none;">
+                                ${repliesHTML}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            
+            commentsContainer.innerHTML = commentsHTML;
         }
         
         // إضافة تأثيرات تفاعلية إضافية
@@ -1564,6 +1879,9 @@
                     this.style.transform = 'translateY(0)';
                 });
             });
+            
+            // عرض التعليقات عند تحميل الصفحة
+            renderAllComments();
         });
     </script>
 </body>
