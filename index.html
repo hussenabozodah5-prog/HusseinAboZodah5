@@ -6,7 +6,7 @@
     <title>Hussein AboZodah</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* الأساسيات */
+        /* جميع الأنماط السابقة تبقى كما هي */
         * {
             margin: 0;
             padding: 0;
@@ -33,7 +33,6 @@
             position: relative;
         }
         
-        /* الخلفية المتحركة */
         .background-animation {
             position: fixed;
             top: 0;
@@ -226,7 +225,6 @@
             z-index: 1;
         }
         
-        /* الشعار */
         .logo {
             text-align: center;
             margin: 20px 0;
@@ -245,7 +243,6 @@
             to { text-shadow: 0 0 15px rgba(26, 35, 126, 0.9), 0 0 25px rgba(26, 35, 126, 0.7), 0 0 35px rgba(26, 35, 126, 0.5); }
         }
         
-        /* الترحيب */
         .welcome {
             text-align: center;
             margin: 30px 0;
@@ -263,7 +260,6 @@
             color: var(--dark-color);
         }
         
-        /* الأزرار */
         .btn {
             display: inline-block;
             background-color: var(--primary-color);
@@ -316,7 +312,6 @@
             margin: 5px 0;
         }
         
-        /* القوائم */
         .menu {
             display: flex;
             flex-wrap: wrap;
@@ -350,7 +345,6 @@
             margin-bottom: 10px;
         }
         
-        /* النماذج */
         .form-container {
             background-color: rgba(255, 255, 255, 0.85);
             padding: 25px;
@@ -395,7 +389,6 @@
             resize: vertical;
         }
         
-        /* التذييل */
         footer {
             background-color: var(--dark-color);
             color: white;
@@ -446,7 +439,6 @@
             margin-bottom: 10px;
         }
         
-        /* التنقل */
         .navigation {
             display: flex;
             justify-content: space-between;
@@ -467,7 +459,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* الأسئلة الشائعة */
         .faq-container {
             margin: 30px 0;
         }
@@ -519,7 +510,6 @@
             max-height: 500px;
         }
         
-        /* قسم التعليقات */
         .comments-section {
             margin-top: 30px;
             background-color: rgba(255, 255, 255, 0.85);
@@ -641,7 +631,6 @@
             color: var(--secondary-color);
         }
         
-        /* صفحة من أنا */
         .about-content {
             background-color: rgba(255, 255, 255, 0.85);
             padding: 30px;
@@ -679,7 +668,6 @@
             animation: pulse 2s infinite;
         }
         
-        /* صفحة اتصل بي */
         .contact-info {
             background-color: rgba(255, 255, 255, 0.85);
             padding: 30px;
@@ -713,7 +701,6 @@
             margin-left: 10px;
         }
         
-        /* صفحة سياسة الخصوصية */
         .privacy-content {
             background-color: rgba(255, 255, 255, 0.85);
             padding: 30px;
@@ -744,7 +731,6 @@
             text-align: justify;
         }
         
-        /* إضافة أنماط للإشعارات */
         .notification {
             position: fixed;
             top: 20px;
@@ -785,7 +771,6 @@
             100% { transform: rotate(360deg); }
         }
         
-        /* التجاوب */
         @media (max-width: 768px) {
             .logo h1 {
                 font-size: 2rem;
@@ -1519,9 +1504,13 @@
     </div>
 
     <script>
+        // API Keys لـ JSONbin.io - استخدم المفاتيح الخاصة بك
+        const JSONBIN_API_KEY = '$2a$10$MjGKGc1zKhCeeOWVMEDXUOZAtxhQL3nKY6nwo85CqcIl0nBD2eqsG';
+        const JSONBIN_BIN_ID = '691e132e43b1c97be9b7cfa4';
+        
         // متغير لتتبع الصفحة السابقة
         let previousPage = 'home-page';
-        let bookingSource = ''; // لتتبع مصدر الدخول لصفحة الحجز
+        let bookingSource = '';
         
         // تخزين التعليقات محلياً
         let comments = {
@@ -1530,82 +1519,119 @@
             office: []
         };
         
-        // دالة لمزامنة التعليقات مع قاعدة بيانات افتراضية
-        function syncComments() {
-            // محاكاة قاعدة بيانات افتراضية باستخدام localStorage
-            // في تطبيق حقيقي، سيتم استبدال هذا باستدعاء API
-            const dbComments = localStorage.getItem('husseinAboZodahComments');
-            
-            if (dbComments) {
-                // دمج التعليقات المحلية مع قاعدة البيانات
-                const serverComments = JSON.parse(dbComments);
+        // دالة لجلب التعليقات من السحابة
+        async function fetchCommentsFromCloud() {
+            try {
+                const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+                    headers: {
+                        'X-Master-Key': JSONBIN_API_KEY
+                    }
+                });
                 
-                // دمج التعليقات من كل قسم
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.record || { consultation: [], design: [], office: [] };
+                } else {
+                    console.error('فشل في جلب التعليقات:', response.status);
+                }
+            } catch (error) {
+                console.error('خطأ في جلب التعليقات:', error);
+            }
+            return { consultation: [], design: [], office: [] };
+        }
+        
+        // دالة لحفظ التعليقات في السحابة
+        async function saveCommentsToCloud() {
+            try {
+                const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': JSONBIN_API_KEY
+                    },
+                    body: JSON.stringify(comments)
+                });
+                
+                if (response.ok) {
+                    console.log('تم حفظ التعليقات بنجاح');
+                    return true;
+                } else {
+                    console.error('فشل في حفظ التعليقات:', response.status);
+                    return false;
+                }
+            } catch (error) {
+                console.error('خطأ في حفظ التعليقات:', error);
+                return false;
+            }
+        }
+        
+        // دالة لمزامنة التعليقات
+        async function syncComments() {
+            try {
+                console.log('جاري مزامنة التعليقات...');
+                const cloudComments = await fetchCommentsFromCloud();
+                
                 ['consultation', 'design', 'office'].forEach(section => {
-                    if (serverComments[section]) {
-                        // دمج التعليقات مع تجنب التكرار
+                    if (cloudComments[section]) {
                         const existingIds = new Set(comments[section].map(c => c.id));
-                        serverComments[section].forEach(comment => {
+                        cloudComments[section].forEach(comment => {
                             if (!existingIds.has(comment.id)) {
                                 comments[section].push(comment);
                             }
                         });
                         
-                        // ترتيب التعليقات حسب التاريخ (الأحدث أولاً)
                         comments[section].sort((a, b) => b.id - a.id);
                     }
                 });
                 
-                // حفظ التعليقات المدمجة محلياً
                 localStorage.setItem('husseinDesignerComments', JSON.stringify(comments));
+                renderAllComments();
+                console.log('تمت المزامنة بنجاح');
+                
+            } catch (error) {
+                console.error('خطأ في المزامنة:', error);
             }
-            
-            // حفظ التعليقات في قاعدة البيانات الافتراضية (لجميع المستخدمين)
-            localStorage.setItem('husseinAboZodahComments', JSON.stringify(comments));
         }
         
-        // تحميل التعليقات من التخزين المحلي عند تحميل الصفحة
-        document.addEventListener('DOMContentLoaded', function() {
-            // محاولة تحميل التعليقات المحلية أولاً
+        // تحميل التعليقات عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', async function() {
             const savedComments = localStorage.getItem('husseinDesignerComments');
             if (savedComments) {
                 comments = JSON.parse(savedComments);
+                renderAllComments();
             }
             
-            // مزامنة مع قاعدة البيانات الافتراضية
-            syncComments();
+            await syncComments();
             
-            // عرض التعليقات
-            renderAllComments();
+            setInterval(syncComments, 3000);
             
-            // إعداد استماع للتغييرات في قاعدة البيانات (محاكاة تحديث حقيقي)
-            setInterval(syncComments, 5000); // تحديث كل 5 ثوان
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                });
+                
+                item.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
         });
         
         // دالة للتنقل بين الصفحات
         function showPage(pageId) {
-            // حفظ الصفحة الحالية كسابقة
             previousPage = document.querySelector('.page.active').id;
             
-            // إذا كنا ننتقل إلى صفحة الحجز، احفظ مصدر الدخول
             if (pageId === 'booking-page') {
                 bookingSource = previousPage;
             }
             
-            // إخفاء جميع الصفحات
             const pages = document.querySelectorAll('.page');
             pages.forEach(page => {
                 page.classList.remove('active');
             });
             
-            // إظهار الصفحة المطلوبة
             document.getElementById(pageId).classList.add('active');
-            
-            // التمرير إلى أعلى الصفحة
             window.scrollTo(0, 0);
-            
-            // مزامنة التعليقات عند تغيير الصفحة
-            syncComments();
         }
         
         // دالة للرجوع للصفحة السابقة
@@ -1642,12 +1668,10 @@
             const submitText = document.getElementById('submit-text');
             const submitLoading = document.getElementById('submit-loading');
             
-            // عرض حالة التحميل
             submitText.style.display = 'none';
             submitLoading.style.display = 'inline-block';
             submitBtn.disabled = true;
             
-            // إرسال البيانات إلى Formspree
             const formData = new FormData(this);
             
             fetch(this.action, {
@@ -1662,7 +1686,6 @@
                     showNotification('تم إرسال طلبك بنجاح! سنتواصل معك قريباً.', 'success');
                     this.reset();
                     
-                    // الانتقال إلى الصفحة الرئيسية بعد 3 ثوان
                     setTimeout(() => {
                         showPage('home-page');
                     }, 3000);
@@ -1674,7 +1697,6 @@
                 showNotification('حدث خطأ في الإرسال. يرجى المحاولة مرة أخرى.', 'error');
             })
             .finally(() => {
-                // إعادة عرض زر الإرسال
                 submitText.style.display = 'inline';
                 submitLoading.style.display = 'none';
                 submitBtn.disabled = false;
@@ -1686,7 +1708,6 @@
             const answer = element.nextElementSibling;
             const isActive = element.classList.contains('active');
             
-            // إغلاق جميع الأسئلة المفتوحة
             document.querySelectorAll('.faq-question').forEach(q => {
                 q.classList.remove('active');
             });
@@ -1694,7 +1715,6 @@
                 a.classList.remove('active');
             });
             
-            // فتح السؤال الحالي إذا لم يكن مفتوحاً
             if (!isActive) {
                 element.classList.add('active');
                 answer.classList.add('active');
@@ -1702,7 +1722,7 @@
         }
         
         // دالة لإضافة تعليق جديد
-        function addComment(section) {
+        async function addComment(section) {
             let nameInput, commentInput, buttonId, textId, loadingId;
             
             if (section === 'design') {
@@ -1737,14 +1757,11 @@
             const submitText = document.getElementById(textId);
             const submitLoading = document.getElementById(loadingId);
             
-            // عرض حالة التحميل
             submitText.style.display = 'none';
             submitLoading.style.display = 'inline-block';
             submitBtn.disabled = true;
             
-            // محاكاة إرسال التعليق
-            setTimeout(() => {
-                // إنشاء تعليق جديد
+            try {
                 const newComment = {
                     id: Date.now(),
                     name: name,
@@ -1753,33 +1770,32 @@
                     replies: []
                 };
                 
-                // إضافة التعليق إلى القائمة
-                comments[section].unshift(newComment); // إضافة في البداية لعرض الأحدث أولاً
+                comments[section].unshift(newComment);
                 
-                // حفظ التعليقات في قاعدة البيانات الافتراضية (لجميع المستخدمين)
-                localStorage.setItem('husseinAboZodahComments', JSON.stringify(comments));
+                const saved = await saveCommentsToCloud();
                 
-                // حفظ التعليقات محلياً أيضاً
-                localStorage.setItem('husseinDesignerComments', JSON.stringify(comments));
+                if (saved) {
+                    localStorage.setItem('husseinDesignerComments', JSON.stringify(comments));
+                    renderComments(section);
+                    nameInput.value = '';
+                    commentInput.value = '';
+                    showNotification('تم إرسال تعليقك بنجاح!', 'success');
+                } else {
+                    showNotification('حدث خطأ في حفظ التعليق', 'error');
+                    comments[section] = comments[section].filter(c => c.id !== newComment.id);
+                }
                 
-                // إعادة عرض التعليقات
-                renderComments(section);
-                
-                // مسح الحقول
-                nameInput.value = '';
-                commentInput.value = '';
-                
-                showNotification('تم إرسال تعليقك بنجاح!', 'success');
-                
-                // إعادة عرض زر الإرسال
+            } catch (error) {
+                showNotification('حدث خطأ في الإرسال', 'error');
+            } finally {
                 submitText.style.display = 'inline';
                 submitLoading.style.display = 'none';
                 submitBtn.disabled = false;
-            }, 1000);
+            }
         }
         
         // دالة لإضافة رد على تعليق
-        function addReply(section, commentId) {
+        async function addReply(section, commentId) {
             const replyNameInput = document.getElementById(`reply-name-${commentId}`);
             const replyTextInput = document.getElementById(`reply-text-${commentId}`);
             
@@ -1791,7 +1807,6 @@
                 return;
             }
             
-            // إيجاد التعليق وإضافة الرد
             const comment = comments[section].find(c => c.id === commentId);
             if (comment) {
                 const newReply = {
@@ -1803,27 +1818,25 @@
                 
                 comment.replies.push(newReply);
                 
-                // حفظ التعليقات في قاعدة البيانات الافتراضية (لجميع المستخدمين)
-                localStorage.setItem('husseinAboZodahComments', JSON.stringify(comments));
+                const saved = await saveCommentsToCloud();
                 
-                // حفظ التعليقات محلياً
-                localStorage.setItem('husseinDesignerComments', JSON.stringify(comments));
-                
-                // إعادة عرض التعليقات
-                renderComments(section);
-                
-                showNotification('تم إرسال ردك بنجاح!', 'success');
+                if (saved) {
+                    localStorage.setItem('husseinDesignerComments', JSON.stringify(comments));
+                    renderComments(section);
+                    showNotification('تم إرسال ردك بنجاح!', 'success');
+                } else {
+                    showNotification('حدث خطأ في حفظ الرد', 'error');
+                    comment.replies = comment.replies.filter(r => r.id !== newReply.id);
+                }
             }
         }
         
         // دالة لعرض نموذج الرد
         function showReplyForm(commentId) {
-            // إخفاء جميع نماذج الرد
             document.querySelectorAll('.reply-form').forEach(form => {
                 form.classList.remove('active');
             });
             
-            // إظهار نموذج الرد المطلوب
             const replyForm = document.getElementById(`reply-form-${commentId}`);
             if (replyForm) {
                 replyForm.classList.add('active');
@@ -1917,21 +1930,6 @@
             
             commentsContainer.innerHTML = commentsHTML;
         }
-        
-        // إضافة تأثيرات تفاعلية إضافية
-        document.addEventListener('DOMContentLoaded', function() {
-            const menuItems = document.querySelectorAll('.menu-item');
-            
-            menuItems.forEach(item => {
-                item.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-5px)';
-                });
-                
-                item.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
-                });
-            });
-        });
     </script>
 </body>
 </html>
