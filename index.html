@@ -1603,7 +1603,7 @@
             
             await syncComments();
             
-            setInterval(syncComments, 3000);
+            setInterval(syncComments, 30000); // خفضت الفترة من 3 ثواني إلى 30 ثانية لتقليل الطلبات
             
             const menuItems = document.querySelectorAll('.menu-item');
             menuItems.forEach(item => {
@@ -1848,14 +1848,14 @@
             const repliesContainer = document.getElementById(`replies-${commentId}`);
             const toggleButton = document.querySelector(`[onclick="toggleReplies(${commentId})"]`);
             
-            if (repliesContainer.style.display === 'none') {
+            if (repliesContainer.style.display === 'none' || !repliesContainer.style.display) {
                 repliesContainer.style.display = 'block';
                 toggleButton.textContent = 'إخفاء الردود';
             } else {
                 repliesContainer.style.display = 'none';
                 toggleButton.textContent = 'عرض الردود';
             }
-        }
+        } 
         
         // دالة لعرض جميع التعليقات
         function renderAllComments() {
