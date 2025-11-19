@@ -1530,13 +1530,56 @@
             office: []
         };
         
+        // دالة لمزامنة التعليقات مع قاعدة بيانات افتراضية
+        function syncComments() {
+            // محاكاة قاعدة بيانات افتراضية باستخدام localStorage
+            // في تطبيق حقيقي، سيتم استبدال هذا باستدعاء API
+            const dbComments = localStorage.getItem('husseinAboZodahComments');
+            
+            if (dbComments) {
+                // دمج التعليقات المحلية مع قاعدة البيانات
+                const serverComments = JSON.parse(dbComments);
+                
+                // دمج التعليقات من كل قسم
+                ['consultation', 'design', 'office'].forEach(section => {
+                    if (serverComments[section]) {
+                        // دمج التعليقات مع تجنب التكرار
+                        const existingIds = new Set(comments[section].map(c => c.id));
+                        serverComments[section].forEach(comment => {
+                            if (!existingIds.has(comment.id)) {
+                                comments[section].push(comment);
+                            }
+                        });
+                        
+                        // ترتيب التعليقات حسب التاريخ (الأحدث أولاً)
+                        comments[section].sort((a, b) => b.id - a.id);
+                    }
+                });
+                
+                // حفظ التعليقات المدمجة محلياً
+                localStorage.setItem('husseinDesignerComments', JSON.stringify(comments));
+            }
+            
+            // حفظ التعليقات في قاعدة البيانات الافتراضية (لجميع المستخدمين)
+            localStorage.setItem('husseinAboZodahComments', JSON.stringify(comments));
+        }
+        
         // تحميل التعليقات من التخزين المحلي عند تحميل الصفحة
         document.addEventListener('DOMContentLoaded', function() {
+            // محاولة تحميل التعليقات المحلية أولاً
             const savedComments = localStorage.getItem('husseinDesignerComments');
             if (savedComments) {
                 comments = JSON.parse(savedComments);
-                renderAllComments();
             }
+            
+            // مزامنة مع قاعدة البيانات الافتراضية
+            syncComments();
+            
+            // عرض التعليقات
+            renderAllComments();
+            
+            // إعداد استماع للتغييرات في قاعدة البيانات (محاكاة تحديث حقيقي)
+            setInterval(syncComments, 5000); // تحديث كل 5 ثوان
         });
         
         // دالة للتنقل بين الصفحات
@@ -1560,6 +1603,9 @@
             
             // التمرير إلى أعلى الصفحة
             window.scrollTo(0, 0);
+            
+            // مزامنة التعليقات عند تغيير الصفحة
+            syncComments();
         }
         
         // دالة للرجوع للصفحة السابقة
@@ -1696,7 +1742,7 @@
             submitLoading.style.display = 'inline-block';
             submitBtn.disabled = true;
             
-            // محاكاة إرسال التعليق (في تطبيق حقيقي، سيتم إرساله إلى الخادم)
+            // محاكاة إرسال التعليق
             setTimeout(() => {
                 // إنشاء تعليق جديد
                 const newComment = {
@@ -1708,9 +1754,12 @@
                 };
                 
                 // إضافة التعليق إلى القائمة
-                comments[section].push(newComment);
+                comments[section].unshift(newComment); // إضافة في البداية لعرض الأحدث أولاً
                 
-                // حفظ التعليقات في التخزين المحلي
+                // حفظ التعليقات في قاعدة البيانات الافتراضية (لجميع المستخدمين)
+                localStorage.setItem('husseinAboZodahComments', JSON.stringify(comments));
+                
+                // حفظ التعليقات محلياً أيضاً
                 localStorage.setItem('husseinDesignerComments', JSON.stringify(comments));
                 
                 // إعادة عرض التعليقات
@@ -1754,7 +1803,10 @@
                 
                 comment.replies.push(newReply);
                 
-                // حفظ التعليقات في التخزين المحلي
+                // حفظ التعليقات في قاعدة البيانات الافتراضية (لجميع المستخدمين)
+                localStorage.setItem('husseinAboZodahComments', JSON.stringify(comments));
+                
+                // حفظ التعليقات محلياً
                 localStorage.setItem('husseinDesignerComments', JSON.stringify(comments));
                 
                 // إعادة عرض التعليقات
@@ -1879,9 +1931,6 @@
                     this.style.transform = 'translateY(0)';
                 });
             });
-            
-            // عرض التعليقات عند تحميل الصفحة
-            renderAllComments();
         });
     </script>
 </body>
